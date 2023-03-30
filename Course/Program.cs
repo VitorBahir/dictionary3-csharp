@@ -24,45 +24,64 @@ public class Program
         Console.WriteLine(" Do want go out of screen, type 0");
         Console.WriteLine();
 
-        while (status)
+        try
         {
-            Console.WriteLine("Enter product number first, then the desired quantity:");
-            int numberOrder = int.Parse(Console.ReadLine());
-            if (numberOrder != 0)
+            while (status)
             {
-                Console.WriteLine("Type the order's quantity: ");
-                int qttOrder = int.Parse(Console.ReadLine());
-
-                if (orders.ContainsKey(numberOrder))
+                Console.WriteLine("Enter product number first, then the desired quantity:");
+                int numberOrder = int.Parse(Console.ReadLine());
+                if (numberOrder != 0)
                 {
-                    orders[numberOrder] += qttOrder;
+                    Console.WriteLine("Type the order's quantity: ");
+                    int qttOrder = int.Parse(Console.ReadLine());
+
+                    if (orders.ContainsKey(numberOrder))
+                    {
+                        orders[numberOrder] += qttOrder;
+                    }
+                    else
+                    {
+                        orders[numberOrder] = qttOrder;
+                    }
                 }
                 else
                 {
-                    orders[numberOrder] = qttOrder;
+                    status = false;
                 }
             }
-            else
+
+            foreach (var order in orders)
             {
-                status = false;
+                Console.WriteLine($"Item price {order.Key}: " + items[order.Key]);
+
+                products.Add(new Product(order.Key, order.Value, items[order.Key]));
             }
-        }
 
-        foreach (var order in orders)
+            Console.WriteLine();
+
+            double sum = 0;
+            foreach (Product product in products)
+            {
+                sum += product.Total(product.Quantity, product.Price);
+            }
+
+            Console.WriteLine("Order total value: " + sum.ToString("F2", CultureInfo.InvariantCulture));
+        }
+        catch (FormatException e)
         {
-            Console.WriteLine($"Item price {order.Key}: " + items[order.Key]);
-            
-            products.Add(new Product(order.Key, order.Value, items[order.Key]));
+            Console.WriteLine(e.Message);
         }
-
-        Console.WriteLine();
-
-        double sum = 0;
-        foreach (Product product in products)
+        catch (IOException e)
         {
-            sum += product.Total(product.Quantity, product.Price);
+            Console.WriteLine(e.Message);
         }
-
-        Console.WriteLine("Order total value: " + sum.ToString("F2", CultureInfo.InvariantCulture));
+        catch (KeyNotFoundException e)
+        {
+            Console.WriteLine(e.Message);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 }
